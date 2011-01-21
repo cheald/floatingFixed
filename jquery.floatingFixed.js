@@ -40,7 +40,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     var r = $(this).each(function() {
       var $this = $(this), pos = $this.position();
       $this.data("floatingFixedTop", pos.top);
+      $this.data("floatingFixedLeft", pos.left);
       $this.data("floatingFixedOptions", options);
+      $this.data("floatingFixedTopOrigTop", $this.css("top"));
       triggers.push($this);
     });
     windowScroll();    
@@ -57,17 +59,14 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     if(triggers.length === 0) { return; }
     var scrollY = $window.scrollTop();
     for(var i = 0; i < triggers.length; i++) {
-      var t = triggers[i];
-      var opt = t.data("floatingFixedOptions");
-      if(t.data("floatingFixedTop") < scrollY + opt.padding && !t.data("isFloating")) {
-        t.data("floatingFixedTopOrigPosition", t.css("position"));
-        t.data("floatingFixedTopOrigTop", t.css("top"));
-        t.css({position: 'fixed', top: opt.padding}).data("isFloating", true);
-      } else if(t.data("floatingFixedTop") >= scrollY + opt.padding && t.data("isFloating")) {
-        t.css({position: t.data("floatingFixedTopOrigPosition"), top: t.data("floatingFixedTopOrigTop")}).data("isFloating", false);
+      var t = triggers[i], opt = t.data("floatingFixedOptions"), top = t.data("floatingFixedTop");
+      if(top < scrollY + opt.padding && !t.data("isFloating")) {        
+        t.css({position: 'fixed', top: opt.padding, left: t.data("floatingFixedLeft") }).data("isFloating", true);
+      } else if(top >= scrollY + opt.padding && t.data("isFloating")) {
+        t.css({position: null, top: null, left: null}).data("isFloating", false);
       }
     }
   };
   
-  $window.scroll(windowScroll);  
+  $window.scroll(windowScroll).resize(windowScroll);
 })(jQuery);

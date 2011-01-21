@@ -1,0 +1,1 @@
+This is a quick little jQuery plugin to provide "sticky rail" functionality. Call $.floatingFixed() on an element that is position: absolute, and when the element would scroll off the screen, it will instead be "stuck" on the screen, and will return to its original position when you scroll it back into view. See example.html for more details.
