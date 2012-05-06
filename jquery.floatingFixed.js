@@ -74,5 +74,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     }
   };
 
-  $window.scroll(windowScroll).resize(windowScroll);
+  $window.scroll(windowScroll);//.resize(windowScroll);
+  $window.resize(function(){
+      if(triggers.length === 0) { return; }
+      for(var i = 0; i < triggers.length; i++) {
+         var floater = triggers[i];
+         if(floater.data("isFloating"))
+           floater.css({left: floater.parent().offset().left + floater.data("floatingFixedOrig").left});
+      }
+  });
 })(jQuery);
