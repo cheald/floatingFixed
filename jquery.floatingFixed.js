@@ -1,4 +1,4 @@
-/***********************************************************************
+/*
 This is a simple plugin to allow you to toggle an element between
 position: absolute and position: fixed based on the window scroll
 position. This lets you have an apparently inline element which floats
@@ -30,49 +30,66 @@ USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
 ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-***********************************************************************/
+*/
 
 (function($) {
-  var triggers = [];
+  var $window, triggers, windowScroll;
+  triggers = [];
   $.fn.floatingFixed = function(options) {
+    var r;
     options = $.extend({}, $.floatingFixed.defaults, options);
-    var r = $(this).each(function() {
-      var $this = $(this), pos = $this.position();
+    r = $(this).each(function() {
+      var $this, pos;
+      $this = $(this);
+      pos = $this.position();
       pos.position = $this.css("position");
       $this.data("floatingFixedOrig", pos);
       $this.data("floatingFixedOptions", options);
-      triggers.push($this);
+      return triggers.push($this);
     });
     windowScroll();
     return r;
   };
-
   $.floatingFixed = $.fn.floatingFixed;
   $.floatingFixed.defaults = {
     padding: 0
   };
-
-  var $window = $(window);
-  var windowScroll = function() {
-    if(triggers.length === 0) { return; }
-    var scrollY = $window.scrollTop();
-    for(var i = 0; i < triggers.length; i++) {
-      var t = triggers[i], opt = t.data("floatingFixedOptions");
-      if(!t.data("isFloating")) {
-        var off = t.offset();
-        t.data("floatingFixedTop", off.top);
-        t.data("floatingFixedLeft", off.left);
+  $window = $(window);
+  windowScroll = function() {
+    var i, off_, opt, pos, scrollY, t, top, _results;
+    try {
+      if (triggers.length === 0) {
+        return;
       }
-      var top = top = t.data("floatingFixedTop");
-      if(top < scrollY + opt.padding && !t.data("isFloating")) {
-        t.css({position: 'fixed', top: opt.padding+"px", left: t.data("floatingFixedLeft"), width: t.width() }).data("isFloating", true);
-      } else if(top >= scrollY + opt.padding && t.data("isFloating")) {
-        var pos = t.data("floatingFixedOrig");
-        t.css(pos).data("isFloating", false);
+      scrollY = $window.scrollTop();
+      i = 0;
+      _results = [];
+      while (i < triggers.length) {
+        t = triggers[i];
+        opt = t.data("floatingFixedOptions");
+        if (!t.data("isFloating")) {
+          off_ = t.offset();
+          t.data("floatingFixedTop", off_.top);
+          t.data("floatingFixedLeft", off_.left);
+        }
+        top = top = t.data("floatingFixedTop");
+        if (top < scrollY + opt.padding && !t.data("isFloating")) {
+          t.css({
+            position: "fixed",
+            top: opt.padding + "px",
+            left: t.data("floatingFixedLeft"),
+            width: t.width()
+          }).data("isFloating", true);
+        } else if (top >= scrollY + opt.padding && t.data("isFloating")) {
+          pos = t.data("floatingFixedOrig");
+          t.css(pos).data("isFloating", false);
+        }
+        _results.push(i++);
       }
+      return _results;
+    } catch (error) {
+      return $window.unbind("scroll", windowScroll).unbind("resize", windowScroll);
     }
   };
-
-  $window.scroll(windowScroll).resize(windowScroll);
+  return $window.bind("scroll", windowScroll).bind("resize", windowScroll);
 })(jQuery);
